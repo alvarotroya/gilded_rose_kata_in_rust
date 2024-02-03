@@ -34,13 +34,15 @@ impl GildedRose {
 
     pub fn update_quality(&mut self) {
         for i in 0..self.items.len() {
+            if self.items[i].name == "Sulfuras, Hand of Ragnaros" {
+                continue;
+            }
+
             if self.items[i].name != "Aged Brie"
                 && self.items[i].name != "Backstage passes to a TAFKAL80ETC concert"
             {
                 if self.items[i].quality > 0 {
-                    if self.items[i].name != "Sulfuras, Hand of Ragnaros" {
-                        self.items[i].quality = self.items[i].quality - 1;
-                    }
+                    self.items[i].quality = self.items[i].quality - 1;
                 }
             } else {
                 if self.items[i].quality < 50 {
@@ -62,17 +64,13 @@ impl GildedRose {
                 }
             }
 
-            if self.items[i].name != "Sulfuras, Hand of Ragnaros" {
-                self.items[i].sell_in = self.items[i].sell_in - 1;
-            }
+            self.items[i].sell_in = self.items[i].sell_in - 1;
 
             if self.items[i].sell_in < 0 {
                 if self.items[i].name != "Aged Brie" {
                     if self.items[i].name != "Backstage passes to a TAFKAL80ETC concert" {
                         if self.items[i].quality > 0 {
-                            if self.items[i].name != "Sulfuras, Hand of Ragnaros" {
-                                self.items[i].quality = self.items[i].quality - 1;
-                            }
+                            self.items[i].quality = self.items[i].quality - 1;
                         }
                     } else {
                         self.items[i].quality = self.items[i].quality - self.items[i].quality;
@@ -154,21 +152,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
-    pub fn quality_is_always_lower_than_50() {
-        let item = Item::new("Aged Brie", 1, 0);
-        let items = vec![item];
-        let mut rose = GildedRose::new(items);
-
-        rose.update_quality();
-        rose.update_quality();
-        rose.update_quality();
-
-        let expected_item = Item::new("Aged Brie", -2, 5);
-        assert_eq!(expected_item, rose.items[0]);
-    }
-
-    #[test]
     pub fn sulfuras_never_degrades_or_has_to_be_sold() {
         let item = Item::new("Sulfuras, Hand of Ragnaros", 0, 80);
         let items = vec![item];
@@ -205,6 +188,27 @@ mod tests {
             Item::new("Backstage passes to a TAFKAL80ETC concert", 3, 6),
             Item::new("Backstage passes to a TAFKAL80ETC concert", 0, 6),
             Item::new("Backstage passes to a TAFKAL80ETC concert", -1, 0),
+        ];
+        assert_eq!(expected_items, rose.items);
+    }
+
+    #[test]
+    pub fn quality_is_always_lower_than_50() {
+        let items = vec![
+            Item::new("Aged Brie", 0, 50),
+            Item::new("Aged Brie", -1, 49),
+            Item::new("Backstage passes to a TAFKAL80ETC concert", 1, 50),
+            Item::new("Backstage passes to a TAFKAL80ETC concert", 1, 48),
+        ];
+        let mut rose = GildedRose::new(items);
+
+        rose.update_quality();
+
+        let expected_items = vec![
+            Item::new("Aged Brie", -1, 50),
+            Item::new("Aged Brie", -2, 50),
+            Item::new("Backstage passes to a TAFKAL80ETC concert", 0, 50),
+            Item::new("Backstage passes to a TAFKAL80ETC concert", 0, 50),
         ];
         assert_eq!(expected_items, rose.items);
     }
