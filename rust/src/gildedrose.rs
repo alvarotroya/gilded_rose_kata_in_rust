@@ -35,6 +35,13 @@ pub fn update_regular_item(item: &mut Item) {
     item.sell_in -= 1;
 }
 
+pub fn update_conjured_item(item: &mut Item) {
+    item.quality -= 2;
+
+    item.quality = max(item.quality, 0);
+    item.sell_in -= 1;
+}
+
 pub fn update_aged_brie(item: &mut Item) {
     if item.sell_in > 0 {
         item.quality += 1;
@@ -76,6 +83,7 @@ impl GildedRose {
                 "Sulfuras, Hand of Ragnaros" => {}
                 "Aged Brie" => update_aged_brie(item),
                 "Backstage passes to a TAFKAL80ETC concert" => update_backstage_passes(item),
+                "Conjured Mana Cake" => update_conjured_item(item),
                 _ => update_regular_item(item),
             }
         }
@@ -208,5 +216,17 @@ mod tests {
             Item::new("Backstage passes to a TAFKAL80ETC concert", 0, 50),
         ];
         assert_eq!(expected_items, rose.items);
+    }
+
+    #[test]
+    pub fn quality_of_conjured_items_decreases_twice_as_fast() {
+        let item = Item::new("Conjured Mana Cake", 1, 2);
+        let items = vec![item];
+        let mut rose = GildedRose::new(items);
+
+        rose.update_quality();
+
+        let expected_item = Item::new("Conjured Mana Cake", 0, 0);
+        assert_eq!(expected_item, rose.items[0]);
     }
 }
