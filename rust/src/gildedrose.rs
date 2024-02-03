@@ -24,7 +24,7 @@ impl Display for Item {
     }
 }
 
-pub fn update_regular_item(item: &mut Item) {
+fn update_regular_item(item: &mut Item) {
     if item.sell_in > 0 {
         item.quality -= 1;
     } else {
@@ -35,14 +35,14 @@ pub fn update_regular_item(item: &mut Item) {
     item.sell_in -= 1;
 }
 
-pub fn update_conjured_item(item: &mut Item) {
+fn update_conjured_item(item: &mut Item) {
     item.quality -= 2;
 
     item.quality = max(item.quality, 0);
     item.sell_in -= 1;
 }
 
-pub fn update_aged_brie(item: &mut Item) {
+fn update_aged_brie(item: &mut Item) {
     if item.sell_in > 0 {
         item.quality += 1;
     } else {
@@ -53,7 +53,7 @@ pub fn update_aged_brie(item: &mut Item) {
     item.sell_in -= 1;
 }
 
-pub fn update_backstage_passes(item: &mut Item) {
+fn update_backstage_passes(item: &mut Item) {
     if item.sell_in <= 0 {
         item.quality = 0;
     } else if item.sell_in < 6 {
