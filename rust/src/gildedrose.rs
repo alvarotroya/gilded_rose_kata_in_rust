@@ -24,6 +24,29 @@ impl Display for Item {
     }
 }
 
+#[derive(Debug, PartialEq)]
+enum ItemType {
+    RegularItem,
+    AgedBrie,
+    BackstagePasses,
+    Sulfuras,
+    ConjuredItem,
+}
+
+fn get_item_type(item: &Item) -> ItemType {
+    if item.name.starts_with("Aged Brie") {
+        ItemType::AgedBrie
+    } else if item.name.starts_with("Backstage passes") {
+        ItemType::BackstagePasses
+    } else if item.name.starts_with("Sulfuras") {
+        ItemType::Sulfuras
+    } else if item.name.starts_with("Conjured") {
+        ItemType::ConjuredItem
+    } else {
+        ItemType::RegularItem
+    }
+}
+
 fn update_regular_item(item: &mut Item) {
     if item.sell_in > 0 {
         item.quality -= 1;
@@ -79,12 +102,12 @@ impl GildedRose {
 
     pub fn update_quality(&mut self) {
         for item in self.items.iter_mut() {
-            match &item.name[..] {
-                "Sulfuras, Hand of Ragnaros" => {}
-                "Aged Brie" => update_aged_brie(item),
-                "Backstage passes to a TAFKAL80ETC concert" => update_backstage_passes(item),
-                "Conjured Mana Cake" => update_conjured_item(item),
-                _ => update_regular_item(item),
+            match get_item_type(item) {
+                ItemType::Sulfuras => {}
+                ItemType::AgedBrie => update_aged_brie(item),
+                ItemType::BackstagePasses => update_backstage_passes(item),
+                ItemType::ConjuredItem => update_conjured_item(item),
+                ItemType::RegularItem => update_regular_item(item),
             }
         }
     }
@@ -92,7 +115,7 @@ impl GildedRose {
 
 #[cfg(test)]
 mod tests {
-    use super::{GildedRose, Item};
+    use super::{get_item_type, GildedRose, Item, ItemType};
     #[test]
     pub fn quality_and_sell_date_decrease_by_one() {
         let item = Item::new("Random Item", 1, 1);
@@ -228,5 +251,31 @@ mod tests {
 
         let expected_item = Item::new("Conjured Mana Cake", 0, 0);
         assert_eq!(expected_item, rose.items[0]);
+    }
+
+    macro_rules! test_get_item_type {
+        ($($name:ident: $item_type:expr, [$($value:expr),*],)*) => {
+            $(
+                #[test]
+                fn $name() {
+                    // Iterate over the slice of item names
+                    for item_name in &[$($value),*] {
+                        let item = Item::new((*item_name).to_string(), 0, 0);
+                        let item_type = get_item_type(&item);
+
+                        // Assert the item type is as specified for each item name
+                        assert_eq!(item_type, $item_type);
+                    }
+                }
+            )*
+        };
+    }
+
+    test_get_item_type! {
+        test_regular_items: ItemType::RegularItem, ["Random Item Name", "A regular item", "A conjured item"],
+        test_conjured_items: ItemType::ConjuredItem, ["Conjured Item 1", "Conjured something else"],
+        test_aged_brie_items: ItemType::AgedBrie, ["Aged Brie item", "Aged Brie something else"],
+        test_backstage_passes_items: ItemType::BackstagePasses, ["Backstage passes to something", "Backstage passes to something else"],
+        test_sulfura_items: ItemType::Sulfuras, ["Sulfuras Something"],
     }
 }
