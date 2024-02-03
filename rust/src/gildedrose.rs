@@ -118,79 +118,73 @@ mod tests {
     use super::{get_item_type, GildedRose, Item, ItemType};
     #[test]
     pub fn quality_and_sell_date_decrease_by_one() {
-        let item = Item::new("Random Item", 1, 1);
-        let items = vec![item];
+        let items = vec![Item::new("Random Item", 1, 1)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
 
-        let expected_item = Item::new("Random Item", 0, 0);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Random Item", 0, 0)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
     pub fn quality_is_never_negative() {
-        let item = Item::new("Random Item", 1, 0);
-        let items = vec![item];
+        let items = vec![Item::new("Random Item", 1, 0)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
 
-        let expected_item = Item::new("Random Item", 0, 0);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Random Item", 0, 0)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
     pub fn quality_degrades_twice_as_fast_after_sell_date() {
-        let item = Item::new("Random Item", 1, 10);
-        let items = vec![item];
+        let items = vec![Item::new("Random Item", 1, 10)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
         rose.update_quality();
 
-        let expected_item = Item::new("Random Item", -1, 7);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Random Item", -1, 7)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
     pub fn aged_brie_increases_in_quality() {
-        let item = Item::new("Aged Brie", 3, 1);
-        let items = vec![item];
+        let items = vec![Item::new("Aged Brie", 3, 1)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
 
-        let expected_item = Item::new("Aged Brie", 2, 2);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Aged Brie", 2, 2)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
     pub fn aged_brie_increases_quality_twice_as_fast_after_sell_date() {
-        let item = Item::new("Aged Brie", 1, 0);
-        let items = vec![item];
+        let items = vec![Item::new("Aged Brie", 1, 0)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
         rose.update_quality();
         rose.update_quality();
 
-        let expected_item = Item::new("Aged Brie", -2, 5);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Aged Brie", -2, 5)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
     pub fn sulfuras_never_degrades_or_has_to_be_sold() {
-        let item = Item::new("Sulfuras, Hand of Ragnaros", 0, 80);
-        let items = vec![item];
+        let items = vec![Item::new("Sulfuras, Hand of Ragnaros", 0, 80)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
         rose.update_quality();
         rose.update_quality();
 
-        let expected_item = Item::new("Sulfuras, Hand of Ragnaros", 0, 80);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Sulfuras, Hand of Ragnaros", 0, 80)];
+        assert_eq!(expected_items, rose.items);
     }
 
     #[test]
@@ -243,14 +237,13 @@ mod tests {
 
     #[test]
     pub fn quality_of_conjured_items_decreases_twice_as_fast() {
-        let item = Item::new("Conjured Mana Cake", 1, 2);
-        let items = vec![item];
+        let items = vec![Item::new("Conjured Mana Cake", 1, 2)];
         let mut rose = GildedRose::new(items);
 
         rose.update_quality();
 
-        let expected_item = Item::new("Conjured Mana Cake", 0, 0);
-        assert_eq!(expected_item, rose.items[0]);
+        let expected_items = vec![Item::new("Conjured Mana Cake", 0, 0)];
+        assert_eq!(expected_items, rose.items);
     }
 
     macro_rules! test_get_item_type {
