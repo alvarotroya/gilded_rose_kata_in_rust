@@ -33,17 +33,19 @@ enum ItemType {
     ConjuredItem,
 }
 
-fn get_item_type(item: &Item) -> ItemType {
-    if item.name.starts_with("Aged Brie") {
-        ItemType::AgedBrie
-    } else if item.name.starts_with("Backstage passes") {
-        ItemType::BackstagePasses
-    } else if item.name.starts_with("Sulfuras") {
-        ItemType::Sulfuras
-    } else if item.name.starts_with("Conjured") {
-        ItemType::ConjuredItem
-    } else {
-        ItemType::RegularItem
+impl From<&Item> for ItemType {
+    fn from(item: &Item) -> Self {
+        if item.name.starts_with("Aged Brie") {
+            ItemType::AgedBrie
+        } else if item.name.starts_with("Backstage passes") {
+            ItemType::BackstagePasses
+        } else if item.name.starts_with("Sulfuras") {
+            ItemType::Sulfuras
+        } else if item.name.starts_with("Conjured") {
+            ItemType::ConjuredItem
+        } else {
+            ItemType::RegularItem
+        }
     }
 }
 
@@ -102,7 +104,7 @@ impl GildedRose {
 
     pub fn update_quality(&mut self) {
         for item in self.items.iter_mut() {
-            match get_item_type(item) {
+            match ItemType::from(&*item) {
                 ItemType::Sulfuras => {}
                 ItemType::AgedBrie => update_aged_brie(item),
                 ItemType::BackstagePasses => update_backstage_passes(item),
@@ -115,7 +117,7 @@ impl GildedRose {
 
 #[cfg(test)]
 mod tests {
-    use super::{get_item_type, GildedRose, Item, ItemType};
+    use super::{GildedRose, Item, ItemType};
     #[test]
     pub fn quality_and_sell_date_decrease_by_one() {
         let items = vec![Item::new("Random Item", 1, 1)];
@@ -247,7 +249,7 @@ mod tests {
         assert_eq!(expected_items, rose.items);
     }
 
-    macro_rules! test_get_item_type {
+    macro_rules! test_item_type_from_item {
         ($($name:ident: $item_type:expr, [$($value:expr),*],)*) => {
             $(
                 #[test]
@@ -255,7 +257,7 @@ mod tests {
                     // Iterate over the slice of item names
                     for item_name in &[$($value),*] {
                         let item = Item::new((*item_name).to_string(), 0, 0);
-                        let item_type = get_item_type(&item);
+                        let item_type = ItemType::from(&item);
 
                         // Assert the item type is as specified for each item name
                         assert_eq!(item_type, $item_type);
@@ -265,7 +267,7 @@ mod tests {
         };
     }
 
-    test_get_item_type! {
+    test_item_type_from_item! {
         test_regular_items: ItemType::RegularItem, ["Random Item Name", "A regular item", "A conjured item"],
         test_conjured_items: ItemType::ConjuredItem, ["Conjured Item 1", "Conjured something else"],
         test_aged_brie_items: ItemType::AgedBrie, ["Aged Brie item", "Aged Brie something else"],
